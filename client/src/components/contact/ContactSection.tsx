@@ -183,67 +183,7 @@ export default function ContactSection() {
               <CardContent className="p-6">
                 <h3 className="text-xl font-montserrat font-bold mb-4">Support the Stream</h3>
                 
-                <p className="text-muted-foreground mb-6">
-                  If you enjoy my content and want to support the channel, here are some ways you can help:
-                </p>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <a 
-                    href="https://twitch.tv/Rennsz" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 bg-muted/30 hover:bg-muted/40 p-4 rounded-lg transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-[#9146FF] rounded-lg flex items-center justify-center">
-                      <FaTwitch className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Subscribe</h4>
-                      <p className="text-xs text-muted-foreground">Support monthly via Twitch</p>
-                    </div>
-                  </a>
-                  
-                  <a 
-                    href="#" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 bg-muted/30 hover:bg-muted/40 p-4 rounded-lg transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-[#F96854] rounded-lg flex items-center justify-center">
-                      <FaPatreon className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Patreon</h4>
-                      <p className="text-xs text-muted-foreground">Exclusive perks and content</p>
-                    </div>
-                  </a>
-                  
-                  <a 
-                    href="#" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 bg-muted/30 hover:bg-muted/40 p-4 rounded-lg transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-[#FFDD00] rounded-lg flex items-center justify-center">
-                      <FaHandHoldingUsd className="text-black" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Donate</h4>
-                      <p className="text-xs text-muted-foreground">One-time support</p>
-                    </div>
-                  </a>
-                  
-                  <a 
-                    href="#" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 bg-muted/30 hover:bg-muted/40 p-4 rounded-lg transition-colors"
-                  >
-                    <div className="w-10 h-10 bg-[#FF0000] rounded-lg flex items-center justify-center">
-                      <FaYoutube className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium">YouTube</h4>
+                {/* Support section removed */}
                       <p className="text-xs text-muted-foreground">Subscribe & share videos</p>
                     </div>
                   </a>
