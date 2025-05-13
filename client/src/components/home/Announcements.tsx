@@ -74,7 +74,7 @@ export default function Announcements() {
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {announcements?.map((announcement: any, index: number) => (
+          {false && announcements?.map((announcement: any, index: number) => (
             <motion.div
               key={announcement.id}
               initial={{ opacity: 0, y: 20 }}

@@ -63,7 +63,7 @@ export default function AboutSection({ socialLinks }: AboutSectionProps) {
                 </p>
               ) : aboutMe?.content ? (
                 <div className="prose prose-lg dark:prose-invert max-w-none">
-                  {formatContent(aboutMe.content)}
+                  <p>Content coming soon!</p>
                 </div>
               ) : (
                 <p className="text-muted-foreground">
