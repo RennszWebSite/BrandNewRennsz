@@ -16,6 +16,9 @@ const AdminIndex = lazy(() => import("@/pages/admin/index"));
 const AdminAnnouncements = lazy(() => import("@/pages/admin/announcements"));
 const AdminSchedule = lazy(() => import("@/pages/admin/schedule"));
 const AdminVideos = lazy(() => import("@/pages/admin/videos"));
+const AdminAbout = lazy(() => import("@/pages/admin/about"));
+const AdminSocialLinks = lazy(() => import("@/pages/admin/social-links"));
+const AdminChannel = lazy(() => import("@/pages/admin/channel"));
 
 function Router() {
   return (
@@ -25,6 +28,9 @@ function Router() {
       <Route path="/admin/announcements" component={AdminAnnouncements} />
       <Route path="/admin/schedule" component={AdminSchedule} />
       <Route path="/admin/videos" component={AdminVideos} />
+      <Route path="/admin/about" component={AdminAbout} />
+      <Route path="/admin/social-links" component={AdminSocialLinks} />
+      <Route path="/admin/channel" component={AdminChannel} />
       <Route component={NotFound} />
     </Switch>
   );

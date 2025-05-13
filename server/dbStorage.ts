@@ -6,7 +6,9 @@ import {
   announcements, type Announcement, type InsertAnnouncement,
   scheduleItems, type ScheduleItem, type InsertScheduleItem,
   videos, type Video, type InsertVideo,
-  settings, type Setting, type InsertSetting
+  settings, type Setting, type InsertSetting,
+  aboutMe, type AboutMe, type InsertAboutMe,
+  socialLinks, type SocialLink, type InsertSocialLink
 } from "@shared/schema";
 import { IStorage } from './storage';
 
@@ -179,6 +181,74 @@ export class DbStorage implements IStorage {
         .returning();
       return result[0];
     }
+  }
+  
+  // About Me operations
+  async getAboutMe(): Promise<AboutMe | undefined> {
+    const result = await db.select().from(aboutMe).limit(1);
+    return result[0];
+  }
+  
+  async updateAboutMe(content: string): Promise<AboutMe> {
+    // Check if about me exists
+    const existingAboutMe = await this.getAboutMe();
+    
+    if (existingAboutMe) {
+      // Update existing about me
+      const result = await db.update(aboutMe)
+        .set({ content })
+        .where(eq(aboutMe.id, existingAboutMe.id))
+        .returning();
+      return result[0];
+    } else {
+      // Create new about me
+      const result = await db.insert(aboutMe)
+        .values({ content })
+        .returning();
+      return result[0];
+    }
+  }
+  
+  // Social Links operations
+  async getSocialLinks(): Promise<SocialLink[]> {
+    return await db.select().from(socialLinks).orderBy(socialLinks.platform);
+  }
+  
+  async getActiveSocialLinks(): Promise<SocialLink[]> {
+    return await db.select()
+      .from(socialLinks)
+      .where(eq(socialLinks.isActive, true))
+      .orderBy(socialLinks.platform);
+  }
+  
+  async getSocialLink(id: number): Promise<SocialLink | undefined> {
+    const result = await db.select().from(socialLinks).where(eq(socialLinks.id, id));
+    return result[0];
+  }
+  
+  async createSocialLink(socialLink: InsertSocialLink): Promise<SocialLink> {
+    const result = await db.insert(socialLinks).values(socialLink).returning();
+    return result[0];
+  }
+  
+  async updateSocialLink(id: number, socialLink: Partial<InsertSocialLink>): Promise<SocialLink | undefined> {
+    const result = await db.update(socialLinks)
+      .set(socialLink)
+      .where(eq(socialLinks.id, id))
+      .returning();
+    return result[0];
+  }
+  
+  async deleteSocialLink(id: number): Promise<boolean> {
+    const result = await db.delete(socialLinks).where(eq(socialLinks.id, id)).returning();
+    return result.length > 0;
+  }
+  
+  // Discord webhook logging
+  async sendLogToDiscord(event: string, data: any): Promise<void> {
+    // Implement Discord webhook logging if needed, or just log to console
+    console.log(`DISCORD LOG: ${event}`, data);
+    // In production, you would send this to the configured Discord webhook URL
   }
 }
 

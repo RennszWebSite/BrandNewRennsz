@@ -7,6 +7,9 @@ import {
   Video,
   Settings,
   LogOut,
+  User,
+  Link as LinkIcon,
+  MonitorPlay
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -52,6 +55,21 @@ export default function AdminPanel({ children, title }: AdminPanelProps) {
       title: "Videos",
       icon: <Video className="h-5 w-5" />,
       href: "/admin/videos",
+    },
+    {
+      title: "About Me",
+      icon: <User className="h-5 w-5" />,
+      href: "/admin/about",
+    },
+    {
+      title: "Social Links",
+      icon: <LinkIcon className="h-5 w-5" />,
+      href: "/admin/social-links",
+    },
+    {
+      title: "Channel",
+      icon: <MonitorPlay className="h-5 w-5" />,
+      href: "/admin/channel",
     },
     {
       title: "Settings",
