@@ -76,6 +76,35 @@ export const insertVideoSchema = createInsertSchema(videos).pick({
   published: true,
 });
 
+// About Me content
+export const aboutMe = pgTable("about_me", {
+  id: serial("id").primaryKey(),
+  content: text("content").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAboutMeSchema = createInsertSchema(aboutMe).pick({
+  content: true,
+});
+
+// Social Media Links
+export const socialLinks = pgTable("social_links", {
+  id: serial("id").primaryKey(),
+  platform: text("platform").notNull(),
+  url: text("url").notNull(),
+  displayName: text("display_name").notNull(),
+  icon: text("icon"),
+  isActive: boolean("is_active").default(true),
+});
+
+export const insertSocialLinkSchema = createInsertSchema(socialLinks).pick({
+  platform: true,
+  url: true,
+  displayName: true,
+  icon: true,
+  isActive: true,
+});
+
 // Settings table
 export const settings = pgTable("settings", {
   id: serial("id").primaryKey(),
@@ -100,6 +129,12 @@ export type InsertScheduleItem = z.infer<typeof insertScheduleItemSchema>;
 
 export type Video = typeof videos.$inferSelect;
 export type InsertVideo = z.infer<typeof insertVideoSchema>;
+
+export type AboutMe = typeof aboutMe.$inferSelect;
+export type InsertAboutMe = z.infer<typeof insertAboutMeSchema>;
+
+export type SocialLink = typeof socialLinks.$inferSelect;
+export type InsertSocialLink = z.infer<typeof insertSocialLinkSchema>;
 
 export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = z.infer<typeof insertSettingSchema>;

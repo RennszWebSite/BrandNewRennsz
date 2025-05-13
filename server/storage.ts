@@ -3,6 +3,8 @@ import {
   announcements, type Announcement, type InsertAnnouncement,
   scheduleItems, type ScheduleItem, type InsertScheduleItem,
   videos, type Video, type InsertVideo,
+  aboutMe, type AboutMe, type InsertAboutMe,
+  socialLinks, type SocialLink, type InsertSocialLink,
   settings, type Setting, type InsertSetting
 } from "@shared/schema";
 
@@ -38,9 +40,24 @@ export interface IStorage {
   updateVideo(id: number, video: Partial<InsertVideo>): Promise<Video | undefined>;
   deleteVideo(id: number): Promise<boolean>;
   
+  // About Me operations
+  getAboutMe(): Promise<AboutMe | undefined>;
+  updateAboutMe(content: string): Promise<AboutMe>;
+  
+  // Social Media Links operations
+  getSocialLinks(): Promise<SocialLink[]>;
+  getActiveSocialLinks(): Promise<SocialLink[]>;
+  getSocialLink(id: number): Promise<SocialLink | undefined>;
+  createSocialLink(socialLink: InsertSocialLink): Promise<SocialLink>;
+  updateSocialLink(id: number, socialLink: Partial<InsertSocialLink>): Promise<SocialLink | undefined>;
+  deleteSocialLink(id: number): Promise<boolean>;
+  
   // Settings operations
   getSetting(key: string): Promise<Setting | undefined>;
   setSetting(key: string, value: string): Promise<Setting>;
+  
+  // Discord webhook logging
+  sendLogToDiscord(event: string, data: any): Promise<void>;
 }
 
 // In-memory storage implementation
@@ -57,6 +74,12 @@ export class MemStorage implements IStorage {
   private videos: Map<number, Video>;
   private videoCurrentId: number;
   
+  private aboutMeData: Map<number, AboutMe>;
+  private aboutMeCurrentId: number;
+  
+  private socialLinksData: Map<number, SocialLink>;
+  private socialLinkCurrentId: number;
+  
   private settings: Map<string, Setting>;
   private settingCurrentId: number;
 
@@ -72,6 +95,12 @@ export class MemStorage implements IStorage {
     
     this.videos = new Map();
     this.videoCurrentId = 1;
+    
+    this.aboutMeData = new Map();
+    this.aboutMeCurrentId = 1;
+    
+    this.socialLinksData = new Map();
+    this.socialLinkCurrentId = 1;
     
     this.settings = new Map();
     this.settingCurrentId = 1;
@@ -161,14 +190,55 @@ export class MemStorage implements IStorage {
       published: true
     });
     
+    // Add about me content
+    this.updateAboutMe("Hey everyone! I'm Rennsz, a passionate streamer dedicated to creating entertaining content. Whether on my IRL channel (Rennsz) or my gaming channel (Rennszino), I strive to create a welcoming community where viewers can relax and have fun. Join me for an exciting mix of real-life adventures and gaming sessions!");
+    
+    // Add social media links
+    this.createSocialLink({
+      platform: "Youtube",
+      url: "https://youtube.com/user/Rennsz",
+      displayName: "Rennsz",
+      icon: "SiYoutube",
+      isActive: true
+    });
+    
+    this.createSocialLink({
+      platform: "Twitter",
+      url: "https://twitter.com/Rennsz",
+      displayName: "@Rennsz",
+      icon: "SiTwitter",
+      isActive: true
+    });
+    
+    this.createSocialLink({
+      platform: "Instagram",
+      url: "https://instagram.com/Rennsz",
+      displayName: "@Rennsz",
+      icon: "SiInstagram",
+      isActive: true
+    });
+    
+    this.createSocialLink({
+      platform: "Discord",
+      url: "https://discord.gg/Rennsz",
+      displayName: "Rennsz Community",
+      icon: "SiDiscord",
+      isActive: true
+    });
+    
+    this.createSocialLink({
+      platform: "Twitch",
+      url: "https://twitch.tv/Rennsz",
+      displayName: "Rennsz",
+      icon: "SiTwitch",
+      isActive: true
+    });
+    
     // Add settings
-    this.setSetting("streamStatus", "online");
-    this.setSetting("viewerCount", "3200");
     this.setSetting("twitchUsername", "Rennsz");
-    this.setSetting("youtubeUrl", "https://youtube.com/user/Rennsz");
-    this.setSetting("twitterUrl", "https://twitter.com/Rennsz");
-    this.setSetting("instagramUrl", "https://instagram.com/Rennsz");
-    this.setSetting("discordUrl", "https://discord.gg/Rennsz");
+    this.setSetting("twitchAltUsername", "Rennszino");
+    this.setSetting("currentChannel", "Rennsz");
+    this.setSetting("discordWebhookUrl", "https://discord.com/api/webhooks/1365497995558387763/A8YNKwHabFEjWc4_3uJCCsZIn5fbz5S4C-oDIwMmDBZNMkR892xPpgNOlN_HZHt9x7hs");
   }
 
   // User operations
@@ -342,6 +412,105 @@ export class MemStorage implements IStorage {
       const setting: Setting = { id, key, value };
       this.settings.set(key, setting);
       return setting;
+    }
+  }
+  
+  // About Me operations
+  async getAboutMe(): Promise<AboutMe | undefined> {
+    // Get the first about me entry (there should only be one)
+    const aboutMeEntries = Array.from(this.aboutMeData.values());
+    return aboutMeEntries.length > 0 ? aboutMeEntries[0] : undefined;
+  }
+  
+  async updateAboutMe(content: string): Promise<AboutMe> {
+    const existingAboutMe = await this.getAboutMe();
+    
+    if (existingAboutMe) {
+      const updated: AboutMe = { 
+        ...existingAboutMe, 
+        content,
+        updatedAt: new Date()
+      };
+      this.aboutMeData.set(existingAboutMe.id, updated);
+      return updated;
+    } else {
+      const id = this.aboutMeCurrentId++;
+      const now = new Date();
+      const aboutMe: AboutMe = { 
+        id, 
+        content, 
+        updatedAt: now 
+      };
+      this.aboutMeData.set(id, aboutMe);
+      return aboutMe;
+    }
+  }
+  
+  // Social Media Links operations
+  async getSocialLinks(): Promise<SocialLink[]> {
+    return Array.from(this.socialLinksData.values())
+      .sort((a, b) => a.platform.localeCompare(b.platform));
+  }
+  
+  async getActiveSocialLinks(): Promise<SocialLink[]> {
+    return (await this.getSocialLinks())
+      .filter(link => link.isActive);
+  }
+  
+  async getSocialLink(id: number): Promise<SocialLink | undefined> {
+    return this.socialLinksData.get(id);
+  }
+  
+  async createSocialLink(insertSocialLink: InsertSocialLink): Promise<SocialLink> {
+    const id = this.socialLinkCurrentId++;
+    const socialLink: SocialLink = { ...insertSocialLink, id };
+    this.socialLinksData.set(id, socialLink);
+    return socialLink;
+  }
+  
+  async updateSocialLink(id: number, updateData: Partial<InsertSocialLink>): Promise<SocialLink | undefined> {
+    const socialLink = this.socialLinksData.get(id);
+    if (!socialLink) return undefined;
+    
+    const updatedSocialLink: SocialLink = { 
+      ...socialLink, 
+      ...updateData
+    };
+    
+    this.socialLinksData.set(id, updatedSocialLink);
+    return updatedSocialLink;
+  }
+  
+  async deleteSocialLink(id: number): Promise<boolean> {
+    return this.socialLinksData.delete(id);
+  }
+  
+  // Discord webhook logging
+  async sendLogToDiscord(event: string, data: any): Promise<void> {
+    const webhook = await this.getSetting("discordWebhookUrl");
+    if (!webhook) return;
+    
+    const content = {
+      username: "Rennsz Website",
+      embeds: [{
+        title: `Event: ${event}`,
+        description: typeof data === 'object' ? JSON.stringify(data, null, 2) : String(data),
+        color: 16750848, // Orange color
+        timestamp: new Date().toISOString()
+      }]
+    };
+    
+    try {
+      // Use fetch to send the webhook
+      fetch(webhook.value, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(content)
+      }).catch(err => console.error('Error sending Discord webhook:', err));
+    } catch (error) {
+      console.error('Error sending Discord webhook:', error);
     }
   }
 }
