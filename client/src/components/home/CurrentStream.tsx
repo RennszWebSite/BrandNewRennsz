@@ -15,7 +15,7 @@ export default function CurrentStream({ twitchUsername = "Rennsz" }: CurrentStre
   const [streamStatus, setStreamStatus] = useState<"loading" | "online" | "offline">("loading");
   const { toast } = useToast();
   
-  const { data: settings } = useQuery({
+  const { data: settings } = useQuery<Record<string, string>>({
     queryKey: ['/api/settings'],
   });
 
@@ -23,7 +23,7 @@ export default function CurrentStream({ twitchUsername = "Rennsz" }: CurrentStre
     setStreamStatus("online");
     toast({
       title: "Stream is live!",
-      description: "Rennsz is currently streaming. Enjoy the show!",
+      description: "The stream is now live. Enjoy the show!",
     });
   };
 
@@ -32,7 +32,7 @@ export default function CurrentStream({ twitchUsername = "Rennsz" }: CurrentStre
   };
 
   // Get current channel from settings
-  const currentChannel = settings?.currentChannel || twitchUsername;
+  const currentChannel = settings ? (settings.currentChannel || twitchUsername) : twitchUsername;
 
   return (
     <section className="py-10 bg-gradient-to-b from-secondary to-secondary/95">

@@ -38,7 +38,7 @@ export default function AboutMeEditor({ onSuccess }: AboutMeEditorProps) {
         setIsLoading(true);
         setError(null);
         
-        const response = await apiRequest('GET', '/api/about');
+        const response = await apiRequest<{ id: number, content: string }>('GET', '/api/about');
         
         if (response && response.content) {
           setValue('content', response.content);
