@@ -122,6 +122,11 @@ export default function Footer() {
             >
               <FaTwitch />
             </a>
+            {settings?.social?.discord && (
+              <a 
+                href={settings.social.discord}
+                target="_blank" 
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 <FaDiscord />
