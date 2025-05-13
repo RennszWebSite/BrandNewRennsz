@@ -524,6 +524,13 @@ export let storage: IStorage = new MemStorage();
 
 // Set up the database storage
 async function setupStorage() {
+  // Only try connecting to database if DATABASE_URL is provided
+  if (!process.env.DATABASE_URL) {
+    console.log('No DATABASE_URL provided, using in-memory storage');
+    storage = new MemStorage();
+    return;
+  }
+
   try {
     // Test database connection by fetching a setting
     await dbStorage.getSetting('test');
@@ -531,9 +538,42 @@ async function setupStorage() {
     // If we get here, the connection was successful
     console.log('Successfully connected to database, using DB storage');
     storage = dbStorage;
+    
+    // If in production, periodically check database connection
+    if (process.env.NODE_ENV === 'production') {
+      // Set up a heartbeat to periodically check the database connection
+      setInterval(async () => {
+        try {
+          await dbStorage.getSetting('test');
+          // If we reach here, connection is still good
+        } catch (err) {
+          console.error('Database connection lost, attempting to reconnect:', err);
+          // Try to reconnect by resetting the client
+          try {
+            await dbStorage.getSetting('test');
+            console.log('Successfully reconnected to database');
+          } catch (reconnectError) {
+            console.error('Failed to reconnect to database:', reconnectError);
+          }
+        }
+      }, 60000); // Check every minute
+    }
   } catch (error) {
     console.error('Failed to connect to database, using in-memory storage as fallback:', error);
     // Keep using memory storage
+    
+    // In production, periodically try to reconnect
+    if (process.env.NODE_ENV === 'production') {
+      setInterval(async () => {
+        try {
+          await dbStorage.getSetting('test');
+          console.log('Successfully connected to database, switching to DB storage');
+          storage = dbStorage;
+        } catch (err) {
+          // Silently fail, we'll try again later
+        }
+      }, 300000); // Try every 5 minutes
+    }
   }
 }
 
