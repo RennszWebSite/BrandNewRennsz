@@ -462,6 +462,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // About Me routes
+  app.get('/api/about', async (req, res) => {
+    try {
+      const aboutMe = await storage.getAboutMe();
+      return res.json(aboutMe || { content: '' });
+    } catch (error) {
+      console.error('Error fetching about me:', error);
+      return res.status(500).json({ message: 'Error fetching about me content' });
+    }
+  });
+  
+  app.put('/api/about', authenticate, async (req, res) => {
+    try {
+      const { content } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ message: 'Content is required' });
+      }
+      
+      const aboutMe = await storage.updateAboutMe(content);
+      
+      // Log the about me update
+      storage.sendLogToDiscord('About Me Updated', { 
+        user: (req as any).user.username,
+        contentLength: content.length
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
+      return res.json(aboutMe);
+    } catch (error) {
+      console.error('Error updating about me:', error);
+      return res.status(500).json({ message: 'Error updating about me content' });
+    }
+  });
+  
+  // Social Links routes
+  app.get('/api/social-links', async (req, res) => {
+    try {
+      const links = await storage.getSocialLinks();
+      return res.json(links);
+    } catch (error) {
+      console.error('Error fetching social links:', error);
+      return res.status(500).json({ message: 'Error fetching social links' });
+    }
+  });
+  
+  app.post('/api/social-links', authenticate, async (req, res) => {
+    try {
+      const socialLinkData = insertSocialLinkSchema.parse(req.body);
+      const socialLink = await storage.createSocialLink(socialLinkData);
+      
+      // Log the social link creation
+      storage.sendLogToDiscord('Social Link Created', { 
+        user: (req as any).user.username,
+        platform: socialLink.platform,
+        url: socialLink.url
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
+      return res.status(201).json(socialLink);
+    } catch (error) {
+      console.error('Error creating social link:', error);
+      return res.status(500).json({ message: 'Error creating social link' });
+    }
+  });
+  
+  app.put('/api/social-links/:id', authenticate, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updateData = req.body;
+      
+      const socialLink = await storage.updateSocialLink(id, updateData);
+      
+      if (!socialLink) {
+        return res.status(404).json({ message: 'Social link not found' });
+      }
+      
+      // Log the social link update
+      storage.sendLogToDiscord('Social Link Updated', { 
+        user: (req as any).user.username,
+        id,
+        platform: socialLink.platform,
+        url: socialLink.url,
+        isActive: socialLink.isActive
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
+      return res.json(socialLink);
+    } catch (error) {
+      console.error('Error updating social link:', error);
+      return res.status(500).json({ message: 'Error updating social link' });
+    }
+  });
+  
+  app.delete('/api/social-links/:id', authenticate, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      // Get the social link before deleting for logging
+      const socialLink = await storage.getSocialLink(id);
+      
+      if (!socialLink) {
+        return res.status(404).json({ message: 'Social link not found' });
+      }
+      
+      const success = await storage.deleteSocialLink(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: 'Social link not found' });
+      }
+      
+      // Log the social link deletion
+      storage.sendLogToDiscord('Social Link Deleted', { 
+        user: (req as any).user.username,
+        id,
+        platform: socialLink.platform
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
+      return res.json({ message: 'Social link deleted' });
+    } catch (error) {
+      console.error('Error deleting social link:', error);
+      return res.status(500).json({ message: 'Error deleting social link' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
