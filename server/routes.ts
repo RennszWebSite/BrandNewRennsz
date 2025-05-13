@@ -585,6 +585,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+
+  // Contact form endpoint
+  app.post('/api/contact', async (req, res) => {
+    try {
+      const { name, email, subject, message } = req.body;
+
+      // Send notification to Discord webhook
+      await storage.sendLogToDiscord('Contact Form Submission', {
+        name,
+        email,
+        subject,
+        message,
+        timestamp: new Date().toISOString()
+      });
+
+      return res.json({ success: true });
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      return res.status(500).json({ message: 'Error submitting contact form' });
+    }
+  });
+
+
   app.delete('/api/social-links/:id', authenticate, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
