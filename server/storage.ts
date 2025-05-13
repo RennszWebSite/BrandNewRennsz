@@ -515,8 +515,11 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import the database storage
-import { dbStorage } from './dbStorage';
+// Import the database storage implementation
+import { DbStorage } from './dbStorage';
+
+// Create an instance of the database storage
+const dbStorage = new DbStorage();
 
 // Use memory storage as a fallback if the database connection fails
 // Export the database storage by default, but can be overridden to use memory storage
