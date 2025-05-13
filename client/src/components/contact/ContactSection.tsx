@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { RectangleEllipsis } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -26,9 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { FaHandHoldingUsd, FaPatreon, FaTwitch, FaYoutube } from "react-icons/fa";
 
-// Define the contact form schema
 const contactFormSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -42,7 +41,6 @@ export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  // Initialize the form
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -53,13 +51,10 @@ export default function ContactSection() {
     },
   });
 
-  // Handle form submission
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
     
     try {
-      // In a real implementation, this would send the form data to a backend API
-      // For now, we'll simulate a successful submission after a short delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
@@ -67,7 +62,6 @@ export default function ContactSection() {
         description: "Thanks for reaching out! We'll get back to you soon.",
       });
       
-      // Reset the form
       form.reset();
     } catch (error) {
       toast({
@@ -182,11 +176,8 @@ export default function ContactSection() {
             <Card className="bg-muted/20 border-border overflow-hidden shadow-lg mb-6">
               <CardContent className="p-6">
                 <h3 className="text-xl font-montserrat font-bold mb-4">Support the Stream</h3>
-                
-                {/* Support section removed */}
-                      <p className="text-xs text-muted-foreground">Subscribe & share videos</p>
-                    </div>
-                  </a>
+                <div className="text-sm text-muted-foreground">
+                  <p>Subscribe & share videos</p>
                 </div>
               </CardContent>
             </Card>
