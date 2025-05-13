@@ -1,3 +1,4 @@
+
 services:
   - type: web
     name: rennsz-website
@@ -21,3 +22,4 @@ services:
         - package-lock.json
         - tsconfig.json
         - vite.config.ts
+    autoDeploy: true
