@@ -40,7 +40,7 @@ export default function AboutMeEditor({ onSuccess }: AboutMeEditorProps) {
         
         const response = await apiRequest('GET', '/api/about');
         
-        if (response.content) {
+        if (response && response.content) {
           setValue('content', response.content);
         }
         

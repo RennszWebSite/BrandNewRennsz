@@ -16,7 +16,7 @@ import { Loader2, Plus, Pencil, Trash2, Globe, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
-  SiYoutube, SiTwitter, SiInstagram, SiTwitch, 
+  SiYoutube, SiX, SiInstagram, SiTwitch, 
   SiTiktok, SiDiscord, SiFacebook, SiLinkedin, 
   SiSubstack, SiPatreon, SiKofi
 } from 'react-icons/si';
@@ -24,7 +24,8 @@ import {
 // Icons mapping for different platforms
 const platformIcons: Record<string, any> = {
   youtube: SiYoutube,
-  twitter: SiTwitter,
+  twitter: SiX,
+  x: SiX,
   instagram: SiInstagram,
   twitch: SiTwitch,
   tiktok: SiTiktok,
@@ -84,7 +85,7 @@ export default function SocialLinksEditor() {
   });
   
   // Fetch social links
-  const { data: socialLinks, isLoading, error, refetch } = useQuery({
+  const { data: socialLinks, isLoading, error, refetch } = useQuery<SocialLink[]>({
     queryKey: ['/api/social-links'],
   });
   
@@ -248,7 +249,7 @@ export default function SocialLinksEditor() {
                 Failed to load social links. Please try again.
               </AlertDescription>
             </Alert>
-          ) : socialLinks?.length > 0 ? (
+          ) : socialLinks && socialLinks.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>

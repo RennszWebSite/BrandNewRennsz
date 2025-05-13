@@ -246,9 +246,46 @@ export class DbStorage implements IStorage {
   
   // Discord webhook logging
   async sendLogToDiscord(event: string, data: any): Promise<void> {
-    // Implement Discord webhook logging if needed, or just log to console
-    console.log(`DISCORD LOG: ${event}`, data);
-    // In production, you would send this to the configured Discord webhook URL
+    try {
+      const webhookUrl = "https://discord.com/api/webhooks/1365497995558387763/A8YNKwHabFEjWc4_3uJCCsZIn5fbz5S4C-oDIwMmDBZNMkR892xPpgNOlN_HZHt9x7hs";
+      
+      if (!webhookUrl) {
+        console.error('Discord webhook URL not configured');
+        return;
+      }
+
+      // Format the message
+      const timestamp = new Date().toISOString();
+      const formattedData = JSON.stringify(data, null, 2);
+      
+      const message = {
+        embeds: [
+          {
+            title: `Event: ${event}`,
+            description: `\`\`\`json\n${formattedData}\n\`\`\``,
+            color: 16740864, // Orange color (Rennsz's branding)
+            footer: {
+              text: `Rennsz Website • ${timestamp}`
+            }
+          }
+        ]
+      };
+
+      // Send to Discord webhook
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+      });
+
+      if (!response.ok) {
+        console.error(`Discord webhook error: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Failed to send Discord webhook:', error);
+    }
   }
 }
 

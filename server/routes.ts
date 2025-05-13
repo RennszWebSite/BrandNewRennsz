@@ -462,6 +462,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Channel switching route
+  app.put('/api/settings/channel', authenticate, async (req, res) => {
+    try {
+      const { channel } = req.body;
+      
+      if (!channel) {
+        return res.status(400).json({ message: 'Channel name is required' });
+      }
+      
+      // Save the current channel
+      const setting = await storage.setSetting('currentChannel', channel);
+
+      // Log the channel switch
+      storage.sendLogToDiscord('Channel Switched', { 
+        user: (req as any).user.username,
+        channel
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
+      return res.json({ success: true, currentChannel: channel });
+    } catch (error) {
+      console.error('Error switching channel:', error);
+      return res.status(500).json({ message: 'Error switching channel' });
+    }
+  });
+
   // About Me routes
   app.get('/api/about', async (req, res) => {
     try {
