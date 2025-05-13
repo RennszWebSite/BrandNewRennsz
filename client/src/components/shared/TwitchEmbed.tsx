@@ -106,8 +106,8 @@ export default function TwitchEmbed({
 
   return (
     <div className="relative w-full h-full">
-      <div ref={embedRef} id={uniqueId} className="w-full h-full">
-        <LoadingState message="Loading stream..." />
+      <div ref={embedRef} id={uniqueId} className="w-full h-full absolute inset-0">
+        <LoadingState message="Loading stream..." className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm" />
       </div>
     </div>
   );

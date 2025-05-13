@@ -63,12 +63,14 @@ export default function CurrentStream({ twitchUsername = "Rennsz" }: CurrentStre
               </div>
             </div>
             
-            <div className="bg-muted/40 rounded-lg overflow-hidden shadow-xl relative aspect-video">
-              <TwitchEmbed 
-                channel={currentChannel} 
-                onOnline={handleStreamOnline}
-                onOffline={handleStreamOffline}
-              />
+            <div className="bg-muted/40 rounded-lg overflow-hidden shadow-xl relative">
+              <div className="w-full aspect-video min-h-[300px] sm:min-h-[400px]">
+                <TwitchEmbed 
+                  channel={currentChannel} 
+                  onOnline={handleStreamOnline}
+                  onOffline={handleStreamOffline}
+                />
+              </div>
             </div>
             
             <div className="mt-6 bg-muted/30 rounded-lg p-4">
