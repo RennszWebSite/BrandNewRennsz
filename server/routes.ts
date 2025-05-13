@@ -1,6 +1,3 @@
-Adding Discord logging for website changes and admin actions to various routes.
-```
-```replit_final_file
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -217,6 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertAnnouncementSchema.parse(req.body);
       const announcement = await storage.createAnnouncement(validatedData);
+      await (req as any).logAction('Create Announcement', validatedData);
       return res.status(201).json(announcement);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -244,6 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Announcement not found' });
       }
 
+      await (req as any).logAction('Update Announcement', { id, validatedData });
       return res.json(updatedAnnouncement);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -268,6 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Announcement not found' });
       }
 
+      await (req as any).logAction('Delete Announcement', { id });
       return res.json({ success: true });
     } catch (error) {
       console.error('Announcement deletion error:', error);
@@ -322,6 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertScheduleItemSchema.parse(req.body);
       const scheduleItem = await storage.createScheduleItem(validatedData);
+      await (req as any).logAction('Create Schedule Item', validatedData);
       return res.status(201).json(scheduleItem);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -348,6 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Schedule item not found' });
       }
 
+      await (req as any).logAction('Update Schedule Item', { id, validatedData });
       return res.json(updatedScheduleItem);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -372,6 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Schedule item not found' });
       }
 
+      await (req as any).logAction('Delete Schedule Item', { id });
       return res.json({ success: true });
     } catch (error) {
       console.error('Schedule item deletion error:', error);
@@ -426,6 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = insertVideoSchema.parse(req.body);
       const video = await storage.createVideo(validatedData);
+      await (req as any).logAction('Create Video', validatedData);
       return res.status(201).json(video);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -452,6 +456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Video not found' });
       }
 
+      await (req as any).logAction('Update Video', { id, validatedData });
       return res.json(updatedVideo);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -476,6 +481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Video not found' });
       }
 
+      await (req as any).logAction('Delete Video', { id });
       return res.json({ success: true });
     } catch (error) {
       console.error('Video deletion error:', error);
@@ -571,18 +577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!socialLink) {
         return res.status(404).json({ message: 'Social link not found' });
       }
-
-      // Log the social link update
-      storage.sendLogToDiscord('Social Link Updated', { 
-        user: (req as any).user.username,
-        id,
-        platform: socialLink.platform,
-        url: socialLink.url,
-        isActive: socialLink.isActive
-      }).catch(err => {
-        console.error('Error sending Discord webhook:', err);
-      });
-
+      await (req as any).logAction('Update Social Link', {id, updateData});
       return res.json(socialLink);
     } catch (error) {
       console.error('Error updating social link:', error);
@@ -606,16 +601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!success) {
         return res.status(404).json({ message: 'Social link not found' });
       }
-
-      // Log the social link deletion
-      storage.sendLogToDiscord('Social Link Deleted', { 
-        user: (req as any).user.username,
-        id,
-        platform: socialLink.platform
-      }).catch(err => {
-        console.error('Error sending Discord webhook:', err);
-      });
-
+      await (req as any).logAction('Delete Social Link', { id });
       return res.json({ message: 'Social link deleted' });
     } catch (error) {
       console.error('Error deleting social link:', error);
@@ -626,281 +612,3 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
-```Add logging for social link updates
-Replacing
-<old_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      return res.status(201).json(socialLink);
-</old_str>
-with
-<new_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      await (req as any).logAction('Create Social Link', socialLink);
-      return res.status(201).json(socialLink);
-</new_str>
-Add logging for social link updates
-Replacing
-<old_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      return res.status(201).json(socialLink);
-</old_str>
-with
-<new_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      await (req as any).logAction('Create Social Link', socialLink);
-      return res.status(201).json(socialLink);
-</new_str>
-Add logging for social link updates
-Replacing
-<old_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      return res.status(201).json(socialLink);
-</old_str>
-with
-<new_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      await (req as any).logAction('Create Social Link', socialLink);
-      return res.status(201).json(socialLink);
-</new_str>
-Add logging for social link updates
-Replacing
-<old_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      return res.status(201).json(socialLink);
-</old_str>
-with
-<new_str>
-const socialLink = await storage.createSocialLink(socialLinkData);
-      await (req as any).logAction('Create Social Link', socialLink);
-      return res.status(201).json(socialLink);
-</new_str>
-Add logging to update social link
-Replacing
-<old_str>
-const socialLink = await storage.updateSocialLink(id, updateData);
-
-      if (!socialLink) {
-        return res.status(404).json({ message: 'Social link not found' });
-      }
-
-      // Log the social link update
-      storage.sendLogToDiscord('Social Link Updated', { 
-        user: (req as any).user.username,
-        id,
-        platform: socialLink.platform,
-        url: socialLink.url,
-        isActive: socialLink.isActive
-      }).catch(err => {
-        console.error('Error sending Discord webhook:', err);
-      });
-
-      return res.json(socialLink);
-</old_str>
-with
-<new_str>
-const socialLink = await storage.updateSocialLink(id, updateData);
-
-      if (!socialLink) {
-        return res.status(404).json({ message: 'Social link not found' });
-      }
-      await (req as any).logAction('Update Social Link', {id, updateData});
-      return res.json(socialLink);
-</new_str>
-Add logging to delete social link
-Replacing
-<old_str>
-const success = await storage.deleteSocialLink(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Social link not found' });
-      }
-
-      // Log the social link deletion
-      storage.sendLogToDiscord('Social Link Deleted', { 
-        user: (req as any).user.username,
-        id,
-        platform: socialLink.platform
-      }).catch(err => {
-        console.error('Error sending Discord webhook:', err);
-      });
-
-      return res.json({ message: 'Social link deleted' });
-</old_str>
-with
-<new_str>
-const success = await storage.deleteSocialLink(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Social link not found' });
-      }
-      await (req as any).logAction('Delete Social Link', { id });
-      return res.json({ message: 'Social link deleted' });
-</new_str>
-Add logging for announcement creation
-Replacing
-<old_str>
-const announcement = await storage.createAnnouncement(validatedData);
-      return res.status(201).json(announcement);
-</old_str>
-with
-<new_str>
-const announcement = await storage.createAnnouncement(validatedData);
-      await (req as any).logAction('Create Announcement', validatedData);
-      return res.status(201).json(announcement);
-</new_str>
-Add logging for announcement update
-Replacing
-<old_str>
-const updatedAnnouncement = await storage.updateAnnouncement(id, validatedData);
-
-      if (!updatedAnnouncement) {
-        return res.status(404).json({ message: 'Announcement not found' });
-      }
-
-      return res.json(updatedAnnouncement);
-</old_str>
-with
-<new_str>
-const updatedAnnouncement = await storage.updateAnnouncement(id, validatedData);
-
-      if (!updatedAnnouncement) {
-        return res.status(404).json({ message: 'Announcement not found' });
-      }
-
-      await (req as any).logAction('Update Announcement', { id, validatedData });
-      return res.json(updatedAnnouncement);
-</new_str>
-Add logging for announcement deletion
-Replacing
-<old_str>
-const success = await storage.deleteAnnouncement(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Announcement not found' });
-      }
-
-      return res.json({ success: true });
-</old_str>
-with
-<new_str>
-const success = await storage.deleteAnnouncement(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Announcement not found' });
-      }
-
-      await (req as any).logAction('Delete Announcement', { id });
-      return res.json({ success: true });
-</new_str>
-Add logging for schedule item creation
-Replacing
-<old_str>
-const scheduleItem = await storage.createScheduleItem(validatedData);
-      return res.status(201).json(scheduleItem);
-</old_str>
-with
-<new_str>
-const scheduleItem = await storage.createScheduleItem(validatedData);
-      await (req as any).logAction('Create Schedule Item', validatedData);
-      return res.status(201).json(scheduleItem);
-</new_str>
-Add logging for schedule item update
-Replacing
-<old_str>
-const updatedScheduleItem = await storage.updateScheduleItem(id, validatedData);
-
-      if (!updatedScheduleItem) {
-        return res.status(404).json({ message: 'Schedule item not found' });
-      }
-
-      return res.json(updatedScheduleItem);
-</old_str>
-with
-<new_str>
-const updatedScheduleItem = await storage.updateScheduleItem(id, validatedData);
-
-      if (!updatedScheduleItem) {
-        return res.status(404).json({ message: 'Schedule item not found' });
-      }
-
-      await (req as any).logAction('Update Schedule Item', { id, validatedData });
-      return res.json(updatedScheduleItem);
-</new_str>
-Add logging for schedule item deletion
-Replacing
-<old_str>
-const success = await storage.deleteScheduleItem(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Schedule item not found' });
-      }
-
-      return res.json({ success: true });
-</old_str>
-with
-<new_str>
-const success = await storage.deleteScheduleItem(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Schedule item not found' });
-      }
-
-      await (req as any).logAction('Delete Schedule Item', { id });
-      return res.json({ success: true });
-</new_str>
-Add logging for video creation
-Replacing
-<old_str>
-const video = await storage.createVideo(validatedData);
-      return res.status(201).json(video);
-</old_str>
-with
-<new_str>
-const video = await storage.createVideo(validatedData);
-      await (req as any).logAction('Create Video', validatedData);
-      return res.status(201).json(video);
-</new_str>
-Add logging for video update
-Replacing
-<old_str>
-const updatedVideo = await storage.updateVideo(id, validatedData);
-
-      if (!updatedVideo) {
-        return res.status(404).json({ message: 'Video not found' });
-      }
-
-      return res.json(updatedVideo);
-</old_str>
-with
-<new_str>
-const updatedVideo = await storage.updateVideo(id, validatedData);
-
-      if (!updatedVideo) {
-        return res.status(404).json({ message: 'Video not found' });
-      }
-
-      await (req as any).logAction('Update Video', { id, validatedData });
-      return res.json(updatedVideo);
-</new_str>
-Add logging for video deletion
-Replacing
-<old_str>
-const success = await storage.deleteVideo(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Video not found' });
-      }
-
-      return res.json({ success: true });
-</old_str>
-with
-<new_str>
-const success = await storage.deleteVideo(id);
-
-      if (!success) {
-        return res.status(404).json({ message: 'Video not found' });
-      }
-
-      await (req as any).logAction('Delete Video', { id });
-      return res.json({ success: true });
-</new_str>
