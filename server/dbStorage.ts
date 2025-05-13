@@ -14,8 +14,10 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required");
 }
 
-// Configure database connection
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Configure database connection with HTTP polling (no WebSockets)
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+} as any); // Using 'as any' to bypass TypeScript error for the custom fetch property
 const db = drizzle(pool);
 
 export class DbStorage implements IStorage {

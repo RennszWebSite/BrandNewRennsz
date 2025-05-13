@@ -349,5 +349,24 @@ export class MemStorage implements IStorage {
 // Import the database storage
 import { dbStorage } from './dbStorage';
 
-// Export the database storage instead of memory storage
-export const storage = dbStorage;
+// Use memory storage as a fallback if the database connection fails
+// Export the database storage by default, but can be overridden to use memory storage
+export let storage: IStorage = new MemStorage();
+
+// Set up the database storage
+async function setupStorage() {
+  try {
+    // Test database connection by fetching a setting
+    await dbStorage.getSetting('test');
+    
+    // If we get here, the connection was successful
+    console.log('Successfully connected to database, using DB storage');
+    storage = dbStorage;
+  } catch (error) {
+    console.error('Failed to connect to database, using in-memory storage as fallback:', error);
+    // Keep using memory storage
+  }
+}
+
+// Initialize storage
+setupStorage();
