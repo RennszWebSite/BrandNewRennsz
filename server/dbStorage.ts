@@ -258,17 +258,32 @@ export class DbStorage implements IStorage {
       const timestamp = new Date().toISOString();
       const formattedData = JSON.stringify(data, null, 2);
       
+      // Format data for better readability
+      const formatValue = (value: any) => {
+        if (typeof value === 'object') {
+          return Object.entries(value)
+            .map(([k, v]) => `**${k}:** ${v}`)
+            .join('\n');
+        }
+        return value;
+      };
+
       const message = {
         embeds: [
           {
-            title: `Event: ${event}`,
-            description: `\`\`\`json\n${formattedData}\n\`\`\``,
+            title: `🔔 ${event}`,
+            description: formatValue(data),
             color: 16740864, // Orange color (Rennsz's branding)
             footer: {
-              text: `Rennsz Website • ${timestamp}`
+              text: `Rennsz Website • ${new Date().toLocaleString()}`
+            },
+            thumbnail: {
+              url: "https://cdn.discordapp.com/emojis/1066839268163747941.webp"
             }
           }
-        ]
+        ],
+        username: "Rennsz Website",
+        avatar_url: "https://cdn.discordapp.com/emojis/1066839268163747941.webp"
       };
 
       // Send to Discord webhook
