@@ -122,41 +122,6 @@ export default function Footer() {
             >
               <FaTwitch />
             </a>
-            {settings?.social?.youtube && (
-              <a 
-                href={settings.social.youtube} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <FaYoutube />
-              </a>
-            )}
-            {settings?.social?.twitter && (
-              <a 
-                href={settings.social.twitter} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <FaTwitter />
-              </a>
-            )}
-            {settings?.social?.instagram && (
-              <a 
-                href={settings.social.instagram} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <FaInstagram />
-              </a>
-            )}
-            {settings?.social?.discord && (
-              <a 
-                href={settings.social.discord} 
-                target="_blank" 
-                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 <FaDiscord />
