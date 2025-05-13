@@ -4,6 +4,7 @@ import CurrentStream from "@/components/home/CurrentStream";
 import Announcements from "@/components/home/Announcements";
 import Schedule from "@/components/home/Schedule";
 import Videos from "@/components/home/Videos";
+import Socials from "@/components/home/Socials";
 import AboutSection from "@/components/about/AboutSection";
 import ContactSection from "@/components/contact/ContactSection";
 import ErrorState from "@/components/shared/ErrorState";
@@ -59,6 +60,7 @@ export default function Home() {
       <Announcements />
       <Schedule />
       <Videos />
+      <Socials />
       <AboutSection socialLinks={settings?.social} />
       <ContactSection />
     </>
