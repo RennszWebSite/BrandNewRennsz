@@ -1,7 +1,12 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAnnouncementSchema, insertScheduleItemSchema, insertVideoSchema } from "@shared/schema";
+import { 
+  insertAnnouncementSchema, 
+  insertScheduleItemSchema, 
+  insertVideoSchema,
+  insertSocialLinkSchema
+} from "@shared/schema";
 import { z } from "zod";
 
 // Authentication middleware
@@ -64,24 +69,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Settings routes
   app.get('/api/settings', async (req, res) => {
     try {
-      const streamStatus = await storage.getSetting('streamStatus');
-      const viewerCount = await storage.getSetting('viewerCount');
       const twitchUsername = await storage.getSetting('twitchUsername');
-      const youtubeUrl = await storage.getSetting('youtubeUrl');
-      const twitterUrl = await storage.getSetting('twitterUrl');
-      const instagramUrl = await storage.getSetting('instagramUrl');
-      const discordUrl = await storage.getSetting('discordUrl');
+      const twitchAltUsername = await storage.getSetting('twitchAltUsername');
+      const currentChannel = await storage.getSetting('currentChannel');
+      
+      // Get social links from the database instead of individual settings
+      const socialLinks = await storage.getActiveSocialLinks();
+      
+      // Format social links for the frontend
+      const social: Record<string, string> = {};
+      socialLinks.forEach(link => {
+        social[link.platform.toLowerCase()] = link.url;
+      });
       
       return res.json({
-        streamStatus: streamStatus?.value || 'offline',
-        viewerCount: viewerCount?.value || '0',
         twitchUsername: twitchUsername?.value || 'Rennsz',
-        social: {
-          youtube: youtubeUrl?.value,
-          twitter: twitterUrl?.value,
-          instagram: instagramUrl?.value,
-          discord: discordUrl?.value
-        }
+        twitchAltUsername: twitchAltUsername?.value || 'Rennszino',
+        currentChannel: currentChannel?.value || 'Rennsz',
+        social
+      });
+      
+      // Log the settings request
+      storage.sendLogToDiscord('Settings Request', { ip: req.ip }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
       });
     } catch (error) {
       console.error('Settings fetch error:', error);
@@ -98,10 +108,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const setting = await storage.setSetting(key, value);
+      
+      // Log the settings update
+      storage.sendLogToDiscord('Settings Updated', { 
+        key, 
+        value,
+        user: (req as any).user.username
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
       return res.json(setting);
     } catch (error) {
       console.error('Settings update error:', error);
       return res.status(500).json({ message: 'Error updating setting' });
+    }
+  });
+  
+  // Channel switching endpoint
+  app.put('/api/settings/channel', authenticate, async (req, res) => {
+    try {
+      const { channel } = req.body;
+      
+      if (!channel) {
+        return res.status(400).json({ message: 'Channel name is required' });
+      }
+      
+      // Update the current channel setting
+      await storage.setSetting('currentChannel', channel);
+      
+      // Log the channel change
+      storage.sendLogToDiscord('Channel Changed', { 
+        channel,
+        user: (req as any).user.username,
+        ip: req.ip 
+      }).catch(err => {
+        console.error('Error sending Discord webhook:', err);
+      });
+      
+      return res.json({ message: 'Channel updated successfully', channel });
+    } catch (error) {
+      console.error('Channel update error:', error);
+      return res.status(500).json({ message: 'Error updating channel' });
     }
   });
   
