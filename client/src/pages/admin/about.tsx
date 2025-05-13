@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/context/AuthContext';
@@ -16,7 +17,9 @@ export default function AdminAbout() {
 
   return (
     <AdminPanel title="About Me">
-      <AboutMeEditor />
+      <AboutMeEditor onSuccess={() => {
+        // Optionally handle success, like showing a message
+      }} />
     </AdminPanel>
   );
 }
