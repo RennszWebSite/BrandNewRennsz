@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: rennsz-website
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: PORT
+        value: 5000
+    healthCheckPath: /api/health
+    buildFilter:
+      paths:
+        - server/**
+        - client/**
+        - shared/**
+        - package.json
+        - package-lock.json
+        - tsconfig.json
+        - vite.config.ts
