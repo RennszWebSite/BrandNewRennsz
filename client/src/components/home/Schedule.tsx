@@ -77,7 +77,7 @@ export default function Schedule() {
           </div>
           
           <div className="p-6">
-            {false && scheduleItems && scheduleItems.length > 0 ? (
+            {scheduleItems && scheduleItems.length > 0 ? (
               scheduleItems.map((item: any) => (
                 <div key={item.id} className="schedule-item relative flex flex-col md:flex-row md:items-center justify-between py-4 border-b border-border last:border-b-0 last:pb-0 first:pt-0">
                   <div className="mb-2 md:mb-0">
