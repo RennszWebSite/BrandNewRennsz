@@ -3,6 +3,7 @@ import { Radio } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import TwitchEmbed from "@/components/shared/TwitchEmbed";
+import ChannelSwitcherMini from "@/components/home/ChannelSwitcherMini";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,31 +31,41 @@ export default function CurrentStream({ twitchUsername = "Rennsz" }: CurrentStre
     setStreamStatus("offline");
   };
 
+  // Get current channel from settings
+  const currentChannel = settings?.currentChannel || twitchUsername;
+
   return (
     <section className="py-10 bg-gradient-to-b from-secondary to-secondary/95">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-start gap-8">
           <div className="w-full md:w-8/12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl sm:text-3xl font-montserrat font-bold">
-                <Radio className="inline-block text-primary mr-2" /> Current Stream
-              </h2>
-              <div className="flex items-center space-x-2">
-                {streamStatus === "online" && (
-                  <>
-                    <span className="live-indicator text-green-500 text-sm font-medium">LIVE</span>
-                    <span className="text-sm text-muted-foreground">Started 2h 15m ago</span>
-                  </>
-                )}
-                {streamStatus === "offline" && (
-                  <span className="text-sm text-muted-foreground">Offline</span>
-                )}
+            <div className="flex flex-wrap items-center justify-between mb-6">
+              <div className="flex items-center mb-2 md:mb-0">
+                <h2 className="text-2xl sm:text-3xl font-montserrat font-bold">
+                  <Radio className="inline-block text-primary mr-2" /> Current Stream
+                </h2>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <ChannelSwitcherMini />
+                
+                <div className="flex items-center space-x-2">
+                  {streamStatus === "online" && (
+                    <>
+                      <span className="live-indicator text-green-500 text-sm font-medium">LIVE</span>
+                      <span className="text-sm text-muted-foreground">Started 2h 15m ago</span>
+                    </>
+                  )}
+                  {streamStatus === "offline" && (
+                    <span className="text-sm text-muted-foreground">Offline</span>
+                  )}
+                </div>
               </div>
             </div>
             
             <div className="bg-muted/40 rounded-lg overflow-hidden shadow-xl relative aspect-video">
               <TwitchEmbed 
-                channel={twitchUsername} 
+                channel={currentChannel} 
                 onOnline={handleStreamOnline}
                 onOffline={handleStreamOffline}
               />

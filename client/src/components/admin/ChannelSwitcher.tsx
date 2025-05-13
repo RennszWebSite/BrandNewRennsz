@@ -19,12 +19,12 @@ export default function ChannelSwitcher() {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   
   // Fetch current settings
-  const { data: settings, isLoading, error, refetch } = useQuery({
+  const { data: settings, isLoading, error, refetch } = useQuery<Record<string, string>>({
     queryKey: ['/api/settings'],
   });
   
   // Set selected channel when settings load
-  if (settings?.currentChannel && !selectedChannel) {
+  if (settings && settings.currentChannel && !selectedChannel) {
     setSelectedChannel(settings.currentChannel);
   }
   
@@ -91,16 +91,26 @@ export default function ChannelSwitcher() {
             className="space-y-4"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value={settings?.twitchUsername || 'Rennsz'} id="channel-main" />
+              <RadioGroupItem 
+                value={settings && settings.twitchUsername ? settings.twitchUsername : 'Rennsz'} 
+                id="channel-main" 
+              />
               <Label htmlFor="channel-main" className="cursor-pointer">
-                <div className="font-medium">{settings?.twitchUsername || 'Rennsz'}</div>
+                <div className="font-medium">
+                  {settings && settings.twitchUsername ? settings.twitchUsername : 'Rennsz'}
+                </div>
                 <div className="text-sm text-muted-foreground">IRL Channel</div>
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value={settings?.twitchAltUsername || 'Rennszino'} id="channel-alt" />
+              <RadioGroupItem 
+                value={settings && settings.twitchAltUsername ? settings.twitchAltUsername : 'Rennszino'} 
+                id="channel-alt" 
+              />
               <Label htmlFor="channel-alt" className="cursor-pointer">
-                <div className="font-medium">{settings?.twitchAltUsername || 'Rennszino'}</div>
+                <div className="font-medium">
+                  {settings && settings.twitchAltUsername ? settings.twitchAltUsername : 'Rennszino'}
+                </div>
                 <div className="text-sm text-muted-foreground">Gaming and Chilling Channel</div>
               </Label>
             </div>
@@ -110,7 +120,12 @@ export default function ChannelSwitcher() {
       <CardFooter>
         <Button 
           onClick={handleSwitchChannel}
-          disabled={isLoading || isSubmitting || !selectedChannel || selectedChannel === settings?.currentChannel}
+          disabled={
+            isLoading || 
+            isSubmitting || 
+            !selectedChannel || 
+            (settings && selectedChannel === settings.currentChannel)
+          }
           className="w-full"
         >
           {isSubmitting ? (
